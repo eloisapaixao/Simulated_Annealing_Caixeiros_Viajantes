@@ -28,18 +28,30 @@ distances = [
     [ 662, 1210,  754, 1358, 1244,  708,  480,  856,  514,  468,  354,  844,  730,  536,  194,  798,    0],
 ]
 
-def get_total_distance(tour : list) -> int:
+def generate_coordinates(n_cities):
+    coordinates = []
+    for i in range(n_cities):
+        x = random.randint(0, 100)
+        y = random.randint(0, 100)
+        coordinates.append((x,y))
 
+    return coordinates
+
+#Calcula a distância total percorrida por todos os caixeiros-viajantes
+def get_total_distance(tours):
     total_distance = 0
-
-    for i in range(n_cities - 1):
-
-        total_distance = total_distance + distances[tour[i]][tour[i + 1]]
-
-    total_distance = total_distance + distances[tour[-1]][tour[0]]
-
+    for tour in tours:
+        for i in range(len(tour) - 1):
+            total_distance += distances[tour[i]][tour[i + 1]]
+        if tour:
+            total_distance += distances[tour[-1]][tour[0]]
     return total_distance
 
+#Calcula a solução inicial aleatória
+def initial_solution(n_cities, n_salesman):
+    cities = list(range(n_cities))
+    random.shuffle(cities)
+    return [cities[i::n_salesman] for i in range(n_salesman)]
 
 # swap cities at positions i and j with each other
 def swap(tours):
@@ -47,16 +59,15 @@ def swap(tours):
     salesman_a = random.randint(0, len(tours) - 1)
     salesman_b = random.randint(0, len(tours) - 1)
     
-    while salesman_a == salesman_b:  # Garante que sejam diferentes
+    while salesman_a == salesman_b or not tours[salesman_a] or not tours[salesman_b]:  # Garante que sejam diferentes
         salesman_b = random.randint(0, len(tours) - 1)
     
     # Seleciona uma cidade de cada vendedor
-    if tours[salesman_a] and tours[salesman_b]:  # Verifica que ambos os vendedores têm cidades
-        city_a = random.randint(0, len(tours[salesman_a]) - 1)
-        city_b = random.randint(0, len(tours[salesman_b]) - 1)
+    city_a = random.randint(0, len(tours[salesman_a]) - 1)
+    city_b = random.randint(0, len(tours[salesman_b]) - 1)
         
-        # Troca as cidades entre os vendedores
-        tours[salesman_a][city_a], tours[salesman_b][city_b] = tours[salesman_b][city_b], tours[salesman_a][city_a]
+    # Troca as cidades entre os vendedores
+    tours[salesman_a][city_a], tours[salesman_b][city_b] = tours[salesman_b][city_b], tours[salesman_a][city_a]
     
     return tours
 
@@ -129,6 +140,11 @@ def plot_tour(coordinates, tour):
     pl.ylabel("Y")
     pl.show()
 
-best_known_solution = annealing(initial_solution = random.sample(range(n_cities), n_cities), n_maximum_iterations = 3000, verbose = True)
+coordinates = generate_coordinates(n_cities)
+initial_sol = initial_solution(n_cities, n_salesman)
+best_known_solution = annealing(initial_solution=initial_sol, n_maximum_iterations=3000, verbose=True)
 
-print(best_known_solution, get_total_distance(best_known_solution))
+print("Best known solution:", best_known_solution)
+print("Total distance:", get_total_distance(best_known_solution))
+
+plot_tour(coordinates, best_known_solution)

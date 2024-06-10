@@ -1,41 +1,44 @@
 import random
 import math
-import sys 
 import copy
 import matplotlib.collections as mc #biblioteca para gráficos
 import matplotlib.pylab as pl
 
-n_cities = 17 #número de cidades
-n_salesman = 6
+n_cities = 92 #número de cidades
+n_salesman = 5
 
-distances = [
-    [   0,  548,  776,  696,  582,  274,  502,  194,  308,  194,  536,  502,  388,  354,  468,  776,  662],
-    [ 548,    0,  684,  308,  194,  502,  730,  354,  696,  742, 1084,  594,  480,  674, 1016,  868, 1210],
-    [ 776,  684,    0,  992,  878,  502,  274,  810,  468,  742,  400, 1278, 1164, 1130,  788, 1552,  754],
-    [ 696,  308,  992,    0,  114,  650,  878,  502,  844,  890, 1232,  514,  628,  822, 1164, 560,  1358],
-    [ 582,  194,  878,  114,    0,  536,  764,  388,  730,  776, 1118,  400,  514,  708, 1050,  674, 1244],
-    [ 274,  502,  502,  650,  536,    0,  228,  308,  194,  240,  582,  776,  662,  628,  514, 1050,  708],
-    [ 502,  730,  274,  878,  764,  228,    0,  536,  194,  468,  354, 1004,  890,  856,  514, 1278,  480],
-    [ 194,  354,  810,  502,  388,  308,  536,    0,  342,  388,  730,  468,  354,  320,  662,  742,  856],
-    [ 308,  696,  468,  844,  730,  194,  194,  342,    0,  274,  388,  810,  696,  662,  320, 1084,  514],
-    [ 194,  742,  742,  890,  776,  240,  468,  388,  274,    0,  342,  536,  422,  388,  274,  810,  468],
-    [ 536, 1084,  400, 1232, 1118,  582,  354,  730,  388,  342,    0,  878,  764,  730,  388, 1152,  354],
-    [ 502,  594, 1278,  514,  400,  776, 1004,  468,  810,  536,  878,    0,  114,  308,  650,  274,  844],
-    [ 388,  480, 1164,  628,  514,  662,  890,  354,  696,  422,  764,  114,    0,  194,  536,  388,  730],
-    [ 354,  674, 1130,  822,  708,  628,  856,  320,  662,  388,  730,  308,  194,    0,  342,  422,  536],
-    [ 468, 1016,  788, 1164, 1050,  514,  514,  662,  320,  274,  388,  650,  536,  342,    0,  764,  194],
-    [ 776,  868, 1552,  560,  674, 1050, 1278,  742, 1084,  810, 1152,  274,  388,  422,  764,    0,  798],
-    [ 662, 1210,  754, 1358, 1244,  708,  480,  856,  514,  468,  354,  844,  730,  536,  194,  798,    0],
+coordinates = [
+    (500, 500), (354, 968), (582, 631), (411, 807), (153, 112), (505, 398),
+    (117, 730), (854, 568), (234, 931), (140, 725), (499, 319), (632, 956),
+    (220, 520), (86, 12), (689, 560), (580, 845), (984, 339), (653, 282),
+    (615, 278), (840, 501), (967, 289), (804, 22), (795, 741), (263, 847),
+    (601, 850), (150, 800), (390, 969), (967, 117), (279, 909), (711, 399),
+    (435, 707), (949, 661), (590, 776), (616, 836), (414, 335), (779, 251),
+    (34, 986), (567, 90), (420, 780), (811, 535), (868, 563), (487, 937),
+    (991, 195), (938, 91), (666, 333), (243, 527), (247, 770), (257, 731),
+    (159, 596), (23, 1), (225, 558), (112, 306), (965, 492), (655, 810),
+    (545, 178), (467, 143), (704, 298), (902, 210), (111, 303), (842, 978),
+    (252, 286), (481, 122), (42, 875), (868, 379), (624, 785), (19, 213),
+    (737, 684), (854, 931), (906, 247), (726, 15), (905, 787), (968, 995),
+    (293, 355), (592, 311), (94, 584), (337, 619), (902, 561), (82, 710),
+    (766, 539), (602, 185), (975, 768), (727, 782), (136, 946), (567, 892),
+    (616, 98), (536, 730), (311, 585), (164, 43), (713, 690), (445, 631),
+    (840, 935), (257, 761)
 ]
 
-def generate_coordinates(n_cities):
-    coordinates = []
-    for i in range(n_cities):
-        x = random.randint(0, 100)
-        y = random.randint(0, 100)
-        coordinates.append((x,y))
+def create_problem(coordinates):
+    n_cities = len(coordinates)
 
-    return coordinates
+    distances = [[0 for _ in range(n_cities)] for _ in range(n_cities)]
+
+    for i in range(n_cities):
+        for j in range(i + 1, n_cities):
+            x = coordinates[i][0] - coordinates[j][0]
+            y = coordinates[i][1] - coordinates[j][1]
+            distance = math.sqrt(x**2 + y**2) 
+            distances[i][j] = distances[j][i] = distance
+        
+    return distances
 
 #Calcula a distância total percorrida por todos os caixeiros-viajantes
 def get_total_distance(tours):
@@ -104,45 +107,44 @@ def annealing(initial_solution, n_maximum_iterations, verbose = False):
 
     return best_known_solution
 
-def generate_lines(coordinates, tour):
+def generate_lines(coordinates, tours):
     lines = []
     colors = []
 
-    # Gerar uma cor aleatória para cada linha
-    for _ in range(len(tour) - 1):
-        colors.append((random.random(), random.random(), random.random()))
-
-    for j in range(len(tour) - 1):
+    # Gera uma cor aleatória para cada vendedor
+    for i in range(len(tours)):
+        color = (random.random(), random.random(), random.random())
+        tour = tours[i]
+        for j in range(len(tour) - 1):
+            lines.append([
+                coordinates[tour[j]],
+                coordinates[tour[j + 1]]
+            ])
+            colors.append(color)
         lines.append([
-            coordinates[tour[j]],
-            coordinates[tour[j+1]]
+            coordinates[tour[-1]],
+            coordinates[tour[0]]  # vai do ultimo ao primeiro
         ])
-
-    lines.append([
-        coordinates[tour[-1]],
-        coordinates[tour[0]] # vai do ultimo ao primeiro
-    ])
+        colors.append(color)
 
     return lines, colors
 
-def plot_tour(coordinates, tour):
-    lines, colors = generate_lines(coordinates, tour)
+def plot_tour(coordinates, tours):
+    lines, colors = generate_lines(coordinates, tours)
     lc = mc.LineCollection(lines, colors=colors, linewidths=2)  # Adicionando as cores
-    # subplot == uma folha em branco para desenharmos 
     fig, ax = pl.subplots()
     ax.add_collection(lc)
-    ax.autoscale() # ajusta a figura para fazer caber o desenho
+    ax.autoscale()  # ajusta a figura para fazer caber o desenho
     ax.margins(0.1)
-    # scatter == grafo
     pl.scatter([i[0] for i in coordinates], [i[1] for i in coordinates])
     pl.title("Tour")
     pl.xlabel("X")
     pl.ylabel("Y")
     pl.show()
 
-coordinates = generate_coordinates(n_cities)
+distances = create_problem(coordinates)
 initial_sol = initial_solution(n_cities, n_salesman)
-best_known_solution = annealing(initial_solution=initial_sol, n_maximum_iterations=3000, verbose=True)
+best_known_solution = annealing(initial_solution=initial_sol, n_maximum_iterations=50000, verbose=True)
 
 print("Best known solution:", best_known_solution)
 print("Total distance:", get_total_distance(best_known_solution))

@@ -8,7 +8,7 @@ n_cities = 31
 n_salesman = 3 #numero de caixeiros
 max_cities_per_salesman = 11 #maximo de caixeiros
 population_size = 100
-generations = 50000
+generations = 100
 mutation_rate = 0.5
 
 def generate_coordinates(n_cities):

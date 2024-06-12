@@ -3,6 +3,7 @@ import math
 import copy
 import matplotlib.collections as mc #biblioteca para gráficos
 import matplotlib.pylab as pl
+import time
 
 n_cities = 47 #número de cidades
 n_salesman = 3
@@ -72,6 +73,8 @@ def get_neighbors(current_solution):
 
 def annealing(initial_solution, n_maximum_iterations, verbose = False):
 
+    inicio = time.time()
+
     current_temperature = 100
 
     alpha = (1 / current_temperature)**(1.00 / n_maximum_iterations)
@@ -96,49 +99,33 @@ def annealing(initial_solution, n_maximum_iterations, verbose = False):
                 print(k, current_temperature, get_total_distance(best_known_solution))
         
         current_temperature = alpha * current_temperature
+    
+    fim = time.time()
 
-    return best_known_solution
+    tempo = fim - inicio
 
-def generate_lines(coordinates, tours):
-    lines = []
-    colors = []
+    return best_known_solution, tempo
 
-    # Gera uma cor aleatória para cada vendedor
-    for i in range(len(tours)):
-        color = (random.random(), random.random(), random.random())
-        tour = tours[i]
-        for j in range(len(tour) - 1):
-            lines.append([
-                coordinates[tour[j]],
-                coordinates[tour[j + 1]]
-            ])
-            colors.append(color)
-        lines.append([
-            coordinates[tour[-1]],
-            coordinates[tour[0]]  # vai do ultimo ao primeiro
-        ])
-        colors.append(color)
+def generate_grafico():
+    tempos = []
+    for i in range(100):
+        best_known_solution, delta_tempo = annealing(initial_solution=initial_sol, n_maximum_iterations=8000, verbose=True)
+        tempos.append(delta_tempo)
+    
+    prob = [(i - 0.5)/100 for i in range(1,101)]
 
-    return lines, colors
-
-def plot_tour(coordinates, tours):
-    lines, colors = generate_lines(coordinates, tours)
-    lc = mc.LineCollection(lines, colors=colors, linewidths=2)  # Adicionando as cores
+    tempos.sort()
+    
     fig, ax = pl.subplots()
-    ax.add_collection(lc)
     ax.autoscale()  # ajusta a figura para fazer caber o desenho
     ax.margins(0.1)
-    pl.scatter([i[0] for i in coordinates], [i[1] for i in coordinates])
-    pl.title("Tour")
-    pl.xlabel("X")
-    pl.ylabel("Y")
+    pl.scatter(tempos, prob)
+    pl.title("Gráfico Time-To-Target (TTT) para Simulated Annealing")
+    pl.xlabel("Tempo até o Target")
+    pl.ylabel("Proporção Acumulada de Execuções")
     pl.show()
+
 
 distances = create_problem(coordinates)
 initial_sol = initial_solution(n_cities, n_salesman)
-best_known_solution = annealing(initial_solution=initial_sol, n_maximum_iterations=8000, verbose=True)
-
-print("Best known solution:", best_known_solution)
-print("Total distance:", get_total_distance(best_known_solution))
-
-plot_tour(coordinates, best_known_solution)
+generate_grafico()

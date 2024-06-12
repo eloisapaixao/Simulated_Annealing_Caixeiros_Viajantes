@@ -1,4 +1,4 @@
-#!/Users/u22127/Documents/GitHub/Simulated_Annealing_Caixeiros_Viajantes/Caixeiros_Viajantes_Simulated_Annealing/.venv/bin/python3.12
+#!/Users/u22127/Documents/GitHub/Simulated_Annealing_Caixeiros_Viajantes/Caixeiros_Viajantes_Simulated_Annealing/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

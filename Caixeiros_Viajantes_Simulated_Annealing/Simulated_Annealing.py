@@ -115,14 +115,14 @@ def generate_grafico():
     prob = [(i - 0.5)/100 for i in range(1,101)]
 
     tempos.sort()
-    
-    fig, ax = pl.subplots()
+
+    ax = pl.subplots()
     ax.autoscale()  # ajusta a figura para fazer caber o desenho
     ax.margins(0.1)
     pl.scatter(tempos, prob)
     pl.title("Gráfico Time-To-Target (TTT) para Simulated Annealing")
-    pl.xlabel("Tempo até o Target")
-    pl.ylabel("Proporção Acumulada de Execuções")
+    pl.xlabel("Tempo até o Target (s)")
+    pl.ylabel("Proporção Acumulada de Execuções (%)")
     pl.show()
 
 

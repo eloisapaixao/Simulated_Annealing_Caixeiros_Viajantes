@@ -123,18 +123,18 @@ def genetic_algorithm(coordinates, population_size, generations, mutation_rate):
     best_solution = min(population, key=lambda x: total_distance(x, distances))
     return best_solution, elapsed_time
 
-def generate_grafico(coordinates):
+def generate_grafico(coordinates, num_execucoes=10):
     tempos = []
-    for i in range(10):
+    for i in range(num_execucoes):
         _, delta_tempo = genetic_algorithm(coordinates, population_size, generations, mutation_rate)
         tempos.append(delta_tempo)
 
-    prob = [(i - 0.5)/100 for i in range(1, 101)]
+    prob = [(i - 0.5) / num_execucoes for i in range(1, num_execucoes + 1)]
     tempos.sort()
 
     ax = pl.subplots()
     pl.scatter(tempos, prob)
-    pl.title("Gráfico Time-To-Target (TTT) para Algorítmo genético")
+    pl.title("Gráfico Time-To-Target (TTT) para Simulated Annealing")
     pl.xlabel("Tempo até o Target (s)")
     pl.ylabel("Proporção Acumulada de Execuções (%)")
     pl.show()
@@ -143,4 +143,4 @@ coordinates = generate_coordinates(n_cities)
 best_solution, elapsed_time = genetic_algorithm(coordinates, population_size, generations, mutation_rate)
 print("Best solution:", best_solution)
 print("Total distance:", total_distance(best_solution, create_problem(coordinates)))
-generate_grafico(coordinates)
+generate_grafico(coordinates, num_execucoes=10)

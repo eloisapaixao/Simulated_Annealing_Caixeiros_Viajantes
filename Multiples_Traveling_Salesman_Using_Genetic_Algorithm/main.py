@@ -9,7 +9,7 @@ n_cities = 139
 n_salesman = 7 #numero de caixeiros
 max_cities_per_salesman = 20 #maximo de caixeiros
 population_size = 100
-generations = 500
+generations = 100
 mutation_rate = 0.5
 
 coordinates = [
@@ -148,7 +148,7 @@ def genetic_algorithm(coordinates, population_size, generations, mutation_rate):
 
 def generate_grafico():
     tempos = []
-    for i in range(100):
+    for i in range(10):
         best_known_solution, delta_tempo = genetic_algorithm(coordinates, population_size, generations, mutation_rate)
         tempos.append(delta_tempo)
     
